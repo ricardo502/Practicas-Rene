@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ventas de donas Ricardo</title>
+</head>
+<body>
+
+  <h3>🍩 Ventas de Donas CuervoTIC 🍩</h3>
+
+  <p>
+    <label for="sucursal1">Sucursal 1:</label>
+    <input type="number" id="sucursal1" value="0" min="0" step="any">
+  </p>
+  <p>
+    <label for="sucursal2">Sucursal 2:</label>
+    <input type="number" id="sucursal2" value="0" min="0" step="any">
+  </p>
+  <p>
+    <label for="sucursal3">Sucursal 3:</label>
+    <input type="number" id="sucursal3" value="0" min="0" step="any">
+  </p>
+  <p>
+    <label for="sucursal4">Sucursal 4:</label>
+    <input type="number" id="sucursal4" value="0" min="0" step="any">
+  </p>
+  <p>
+    <label for="sucursal5">Sucursal 5:</label>
+    <input type="number" id="sucursal5" value="0" min="0" step="any">
+  </p>
+  <p>
+    <label for="sucursal6">Sucursal 6:</label>
+    <input type="number" id="sucursal6" value="0" min="0" step="any">
+  </p>
+
+  <button onclick="calcularVentas()">Calcular</button>
+  <p id="resultado"></p>
+
+  <script>
+    function calcularVentas() {
+      // Sumar las ventas de las seis sucursales.
+      var total = 0;
+
+      for (var i = 1; i <= 6; i++) {
+        var venta = document.getElementById("sucursal" + i).value;
+
+        if (venta === "" || Number(venta) < 0) {
+          document.getElementById("resultado").textContent = "Ingresa ventas de cero o más en todas las sucursales.";
+          return;
+        }
+
+        total = total + Number(venta);
+      }
+
+      document.getElementById("resultado").textContent = "Total de ventas del día: $" + total.toFixed(2);
+    }
+  </script>
+
+</body>
+</html>

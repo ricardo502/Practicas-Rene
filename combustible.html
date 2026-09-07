@@ -1,0 +1,34 @@
+<html>
+<body>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Ricardo Mart</title>
+</head>
+
+  <div style="background-color: honeydew; padding: 20px; font-family: Arial; max-width: 450px;">
+    <h1><img src="bomba-de-gas.png" width="30"> Calcular combustible</h1>
+
+    <p>Calcula cuantos litros vas a necesitar</p>
+
+    Kilometros: <input type="number" id="kilometros">
+    <br><br>
+    <button onclick="calcular()" style="background-color: cadetblue; color: white; border: none; padding: 5px; font-size: 20px;">Calcular combustible</button>
+
+    <p id="resultado"></p>
+  </div>
+
+  <script>
+    function calcular() {
+      var km = document.getElementById("kilometros").value;
+      if (km == "" || km < 0) {
+        document.getElementById("resultado").innerHTML = "Ingresa una cantidad valida de kilometros";
+      } else {
+        var litros = km / 10;
+        document.getElementById("resultado").innerHTML = "Carga " + litros + " litros de combustible";
+      }
+    }
+  </script>
+
+</body>
+</html>

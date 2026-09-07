@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Precio de frutas</title>
+</head>
+<body>
+
+  <p>Elija una de las opciones</p>
+
+  <ol>
+    <li>Manzana</li>
+    <li>Naranja</li>
+    <li>Banana</li>
+    <li>Pera</li>
+    <li>Sandía</li>
+  </ol>
+
+  <input type="number" id="opcion" min="1" max="5" aria-label="Número de fruta" style="width: 50px;">
+  <button onclick="mostrarPrecio()">Precio</button>
+
+  <p id="resultado"></p>
+
+  <script>
+    function mostrarPrecio() {
+      var opcion = Number(document.getElementById("opcion").value);
+      var mensaje;
+
+      // Precios de ejemplo en pesos por kilogramo.
+      switch (opcion) {
+        case 1:
+          mensaje = "El precio de la manzana es $35 por kilo.";
+          break;
+        case 2:
+          mensaje = "El precio de la naranja es $20 por kilo.";
+          break;
+        case 3:
+          mensaje = "El precio de la banana es $25 por kilo.";
+          break;
+        case 4:
+          mensaje = "El precio de la pera es $40 por kilo.";
+          break;
+        case 5:
+          mensaje = "El precio de la sandía es $15 por kilo.";
+          break;
+        default:
+          mensaje = "Elige una opción del 1 al 5.";
+      }
+
+      document.getElementById("resultado").textContent = mensaje;
+    }
+  </script>
+
+</body>
+</html>
