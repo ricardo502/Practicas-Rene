@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de sesión</title>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-body">
+    <h1 class="titulo-sistema">Sistema Nutri RMR</h1>
+
+    <main class="acceso">
+        <div id="registro" class="login">
+            <h2>Registrarse</h2>
+
+            <form onsubmit="registrarUsuario(); return false;">
+                <label for="nombreRegistro">Nombre</label>
+                <input id="nombreRegistro" type="text" required>
+
+                <label for="claveRegistro">Contraseña</label>
+                <input id="claveRegistro" type="password" required>
+
+                <label for="ocupacionRegistro">Ocupación</label>
+                <input id="ocupacionRegistro" type="text" required>
+
+                <button type="submit">Registrarme</button>
+                <p id="mensajeRegistro" class="mensaje-registro"></p>
+            </form>
+
+            <p class="ayuda">¿Ya tienes una cuenta?</p>
+            <button class="boton-secundario" onclick="mostrarLogin()">
+                Iniciar sesión
+            </button>
+        </div>
+
+        <div id="inicioSesion" class="login oculto">
+            <h2>Iniciar sesión</h2>
+
+            <form onsubmit="iniciarSesion(); return false;">
+                <label for="nombreLogin">Nombre</label>
+                <input id="nombreLogin" type="text" required>
+
+                <label for="clave">Contraseña</label>
+                <input id="clave" type="password" required>
+
+                <button type="submit">Iniciar sesión</button>
+                <p class="ayuda">Primero registra tus datos</p>
+                <p id="error"></p>
+            </form>
+
+            <button class="boton-secundario" onclick="mostrarRegistro()">
+                Regresar al registro
+            </button>
+        </div>
+    </main>
+
+    <script>
+        var nombreGuardado = "";
+        var claveGuardada = "";
+
+        function registrarUsuario() {
+            nombreGuardado = document.getElementById("nombreRegistro").value;
+            claveGuardada = document.getElementById("claveRegistro").value;
+            var ocupacion = document.getElementById("ocupacionRegistro").value;
+
+            document.getElementById("mensajeRegistro").innerHTML =
+                "Registro correcto: " + nombreGuardado + " - " + ocupacion;
+
+            document.getElementById("nombreLogin").value = nombreGuardado;
+            document.getElementById("clave").value = "";
+            alert("Registro realizado correctamente");
+            mostrarLogin();
+        }
+
+        function mostrarLogin() {
+            document.getElementById("registro").style.display = "none";
+            document.getElementById("inicioSesion").style.display = "block";
+        }
+
+        function mostrarRegistro() {
+            document.getElementById("registro").style.display = "block";
+            document.getElementById("inicioSesion").style.display = "none";
+            document.getElementById("error").innerHTML = "";
+        }
+
+        function iniciarSesion() {
+            var nombre = document.getElementById("nombreLogin").value;
+            var clave = document.getElementById("clave").value;
+
+            if (nombreGuardado == "") {
+                document.getElementById("error").innerHTML =
+                    "Primero debes registrarte";
+            } else if (nombre == nombreGuardado && clave == claveGuardada) {
+                window.location.href = "index.html?nombre=" + encodeURIComponent(nombre);
+            } else {
+                document.getElementById("error").innerHTML =
+                    "Nombre o contraseña incorrectos";
+            }
+        }
+    </script>
+</body>
+</html>

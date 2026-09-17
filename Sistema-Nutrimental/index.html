@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Nutri RMR</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="barra-superior">
+        <h1>Sistema Nutri RMR</h1>
+        <div>
+            <span>Sesión: <strong id="nombreCuenta"></strong></span>
+            <button onclick="cerrarSesion()">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="panel-pacientes">
+        <section class="tarjeta-paciente">
+            <h2>Registrar paciente</h2>
+
+            <form onsubmit="guardarPaciente(); return false;">
+                <label for="nombrePaciente">Nombre completo</label>
+                <input id="nombrePaciente" type="text" placeholder="Ej. Juan Pérez" required>
+
+                <div class="dos-campos">
+                    <div>
+                        <label for="edad">Edad</label>
+                        <input id="edad" type="number" min="1" placeholder="52" required>
+                    </div>
+
+                    <div>
+                        <label for="sexo">Sexo</label>
+                        <select id="sexo">
+                            <option>Masculino</option>
+                            <option>Femenino</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="dos-campos">
+                    <div>
+                        <label for="peso">Peso (kg)</label>
+                        <input id="peso" type="number" min="1" step="0.1" placeholder="70"
+                            oninput="calcularImc()" required>
+                    </div>
+
+                    <div>
+                        <label for="altura">Altura (m)</label>
+                        <input id="altura" type="number" min="0.5" step="0.01" placeholder="1.65"
+                            oninput="calcularImc()" required>
+                    </div>
+                </div>
+
+                <div class="datos-imc">
+                    <span>IMC calculado:</span>
+                    <strong id="imcAutomatico"></strong>
+                    <strong id="diagnosticoAutomatico"></strong>
+                </div>
+
+                <button type="submit">Guardar paciente</button>
+                <p id="mensajePaciente" class="mensaje-registro"></p>
+            </form>
+        </section>
+
+        <section class="tarjeta-consulta">
+            <h2>Nueva consulta</h2>
+
+            <label for="menuPacientes">Paciente</label>
+            <select id="menuPacientes" onchange="mostrarPaciente()">
+                <option value="">Selecciona un paciente</option>
+            </select>
+
+            <div id="datosPaciente" class="resumen-paciente">
+                Selecciona un paciente para ver sus datos.
+            </div>
+
+            <div class="dos-campos">
+                <div>
+                    <label for="fechaConsulta">Fecha</label>
+                    <input id="fechaConsulta" type="date">
+                </div>
+
+                <div>
+                    <label for="horaConsulta">Hora</label>
+                    <input id="horaConsulta" type="time" value="00:00">
+                </div>
+            </div>
+
+            <label for="evolucionConsulta">Evolución del paciente</label>
+            <textarea id="evolucionConsulta"
+                placeholder="Describe los cambios observados desde la última consulta"></textarea>
+
+            <label for="planConsulta">Plan de alimentación</label>
+            <textarea id="planConsulta"
+                placeholder="Describe el plan nutricional para este periodo"></textarea>
+
+            <button onclick="guardarConsulta()">Guardar consulta</button>
+            <p id="mensajeConsulta" class="mensaje-registro"></p>
+
+            <div id="historial" class="historial"></div>
+        </section>
+    </main>
+
+    <script>
+        var datosDireccion = window.location.search;
+        var nombreCuenta = datosDireccion.replace("?nombre=", "");
+
+        if (nombreCuenta == "") {
+            window.location.href = "loggin.html";
+        } else {
+            document.getElementById("nombreCuenta").innerHTML =
+                decodeURIComponent(nombreCuenta);
+        }
+
+        var pacientes = JSON.parse(localStorage.getItem("pacientes"));
+        var consultas = JSON.parse(localStorage.getItem("consultas"));
+
+        if (pacientes == null) {
+            pacientes = [];
+        }
+
+        if (consultas == null) {
+            consultas = [];
+        }
+
+        function calcularImc() {
+            var peso = document.getElementById("peso").value;
+            var altura = document.getElementById("altura").value;
+
+            if (peso != "" && altura != "") {
+                var imc = peso / (altura * altura);
+                var diagnostico = obtenerDiagnostico(imc);
+
+                document.getElementById("imcAutomatico").innerHTML = imc.toFixed(2);
+                document.getElementById("diagnosticoAutomatico").innerHTML = diagnostico;
+            }
+        }
+
+        function obtenerDiagnostico(imc) {
+            if (imc < 18.5) {
+                return "Bajo peso";
+            } else if (imc < 25) {
+                return "Peso normal";
+            } else if (imc < 30) {
+                return "Sobrepeso";
+            } else {
+                return "Obesidad";
+            }
+        }
+
+        function guardarPaciente() {
+            var nombre = document.getElementById("nombrePaciente").value;
+            var edad = document.getElementById("edad").value;
+            var sexo = document.getElementById("sexo").value;
+            var peso = document.getElementById("peso").value;
+            var altura = document.getElementById("altura").value;
+            var imc = peso / (altura * altura);
+            var diagnostico = obtenerDiagnostico(imc);
+
+            var paciente = {
+                id: pacientes.length + 1,
+                nombre: nombre,
+                edad: edad,
+                sexo: sexo,
+                peso: peso,
+                altura: altura,
+                imc: imc.toFixed(2),
+                diagnostico: diagnostico
+            };
+
+            pacientes.push(paciente);
+            localStorage.setItem("pacientes", JSON.stringify(pacientes));
+
+            document.getElementById("mensajePaciente").innerHTML =
+                "Paciente guardado correctamente";
+            limpiarFormularioPaciente();
+            llenarMenuPacientes();
+        }
+
+        function limpiarFormularioPaciente() {
+            document.getElementById("nombrePaciente").value = "";
+            document.getElementById("edad").value = "";
+            document.getElementById("peso").value = "";
+            document.getElementById("altura").value = "";
+            document.getElementById("imcAutomatico").innerHTML = "";
+            document.getElementById("diagnosticoAutomatico").innerHTML = "";
+        }
+
+        function llenarMenuPacientes() {
+            var menu = document.getElementById("menuPacientes");
+            menu.innerHTML = "<option value=''>Selecciona un paciente</option>";
+
+            for (var i = 0; i < pacientes.length; i++) {
+                menu.innerHTML = menu.innerHTML +
+                    "<option value='" + pacientes[i].id + "'>" +
+                    pacientes[i].nombre + "</option>";
+            }
+        }
+
+        function buscarPaciente(id) {
+            for (var i = 0; i < pacientes.length; i++) {
+                if (pacientes[i].id == id) {
+                    return pacientes[i];
+                }
+            }
+        }
+
+        function mostrarPaciente() {
+            var id = document.getElementById("menuPacientes").value;
+            var paciente = buscarPaciente(id);
+
+            if (paciente != null) {
+                document.getElementById("datosPaciente").innerHTML =
+                    "<span>" + paciente.edad + " años - " + paciente.sexo + "</span>" +
+                    "<span>" + paciente.peso + " kg / " + paciente.altura + " m</span>" +
+                    "<span>IMC: " + paciente.imc + "</span>" +
+                    "<span>" + paciente.diagnostico + "</span>";
+                mostrarHistorial(id);
+            } else {
+                document.getElementById("datosPaciente").innerHTML =
+                    "Selecciona un paciente para ver sus datos.";
+                document.getElementById("historial").innerHTML = "";
+            }
+        }
+
+        function guardarConsulta() {
+            var pacienteId = document.getElementById("menuPacientes").value;
+            var fecha = document.getElementById("fechaConsulta").value;
+            var hora = document.getElementById("horaConsulta").value;
+            var evolucion = document.getElementById("evolucionConsulta").value;
+            var plan = document.getElementById("planConsulta").value;
+
+            if (pacienteId == "" || fecha == "" || hora == "" ||
+                evolucion == "" || plan == "") {
+                document.getElementById("mensajeConsulta").innerHTML =
+                    "Completa los datos de la consulta";
+            } else {
+                var consulta = {
+                    pacienteId: pacienteId,
+                    fecha: fecha,
+                    hora: hora,
+                    evolucion: evolucion,
+                    plan: plan
+                };
+
+                consultas.push(consulta);
+                localStorage.setItem("consultas", JSON.stringify(consultas));
+                document.getElementById("mensajeConsulta").innerHTML =
+                    "Consulta guardada correctamente";
+                document.getElementById("evolucionConsulta").value = "";
+                document.getElementById("planConsulta").value = "";
+                mostrarHistorial(pacienteId);
+            }
+        }
+
+        function mostrarHistorial(pacienteId) {
+            var texto = "<h3>Consultas anteriores</h3>";
+            var consultasPaciente = [];
+
+            for (var i = 0; i < consultas.length; i++) {
+                if (consultas[i].pacienteId == pacienteId) {
+                    consultasPaciente.push(consultas[i]);
+                }
+            }
+
+            for (var i = 0; i < consultasPaciente.length; i++) {
+                for (var j = i + 1; j < consultasPaciente.length; j++) {
+                    var fechaUno = consultasPaciente[i].fecha + consultasPaciente[i].hora;
+                    var fechaDos = consultasPaciente[j].fecha + consultasPaciente[j].hora;
+
+                    if (fechaUno < fechaDos) {
+                        var consultaTemporal = consultasPaciente[i];
+                        consultasPaciente[i] = consultasPaciente[j];
+                        consultasPaciente[j] = consultaTemporal;
+                    }
+                }
+            }
+
+            for (var i = 0; i < consultasPaciente.length; i++) {
+                texto = texto + "<div class='consulta-guardada'>" +
+                    "<strong>" + consultasPaciente[i].fecha + " - " +
+                    consultasPaciente[i].hora + "</strong>" +
+                    "<p><b>Evolución:</b> " + consultasPaciente[i].evolucion + "</p>" +
+                    "<p><b>Plan:</b> " + consultasPaciente[i].plan + "</p></div>";
+            }
+
+            if (consultasPaciente.length == 0) {
+                texto = texto + "<p>No hay consultas guardadas.</p>";
+            }
+
+            document.getElementById("historial").innerHTML = texto;
+        }
+
+        function cerrarSesion() {
+            window.location.href = "loggin.html";
+        }
+
+        llenarMenuPacientes();
+    </script>
+</body>
+</html>
